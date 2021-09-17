@@ -55,7 +55,7 @@ public class FlutterForegroundService extends Service {
                 }
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
                         .setSmallIcon(getNotificationIcon(bundle.getString("icon")))
-                        .setColor(Color.toArgb(bundle.getLong("color")))
+                        .setColor(((Number) bundle.getLong("color")).intValue())
                         .setContentTitle(bundle.getString("title"))
                         .setContentText(bundle.getString("content"))
                         .setCategory(NotificationCompat.CATEGORY_SERVICE)

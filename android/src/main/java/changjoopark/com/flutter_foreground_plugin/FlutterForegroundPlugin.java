@@ -71,7 +71,7 @@ public class FlutterForegroundPlugin implements FlutterPlugin, MethodCallHandler
             case "startForegroundService":
                 final Boolean holdWakeLock = call.argument("holdWakeLock");
                 final String icon = call.argument("icon");
-                final int color = call.argument("color");
+                final long color = call.argument("color");
                 final String title = call.argument("title");
                 final String content = call.argument("content");
                 final String subtext = call.argument("subtext");
@@ -114,7 +114,7 @@ public class FlutterForegroundPlugin implements FlutterPlugin, MethodCallHandler
         }
     }
 
-    private void launchForegroundService(String icon, int color, String title, String content, String subtext,
+    private void launchForegroundService(String icon, long color, String title, String content, String subtext,
                                          Boolean chronometer, Boolean stopAction, String stopIcon,
                                          String stopText) {
         Intent intent = new Intent(context, FlutterForegroundService.class);

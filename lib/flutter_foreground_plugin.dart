@@ -16,7 +16,6 @@ class FlutterForegroundPlugin {
   /// [startForegroundService]
   ///
   static Future<void> startForegroundService({
-    bool holdWakeLock = false,
     Function? onStarted,
     Function? onStopped,
     required String iconName,
@@ -28,6 +27,7 @@ class FlutterForegroundPlugin {
     bool stopAction = false,
     String? stopIcon,
     String stopText = 'Close',
+    String channelName = 'Channel for flutter_foreground_plugin',
   }) async {
     if (onStarted != null) {
       onStartedMethod = onStarted;
@@ -38,7 +38,6 @@ class FlutterForegroundPlugin {
     }
 
     await _mainChannel.invokeMethod("startForegroundService", <String, dynamic>{
-      'holdWakeLock': holdWakeLock,
       'icon': iconName,
       'color': color,
       'title': title,
@@ -48,6 +47,7 @@ class FlutterForegroundPlugin {
       'stop_action': stopAction,
       'stop_icon': stopIcon,
       'stop_text': stopText,
+      'channel_name': channelName,
     });
   }
 

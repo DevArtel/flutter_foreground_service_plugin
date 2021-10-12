@@ -1,11 +1,13 @@
 package changjoopark.com.flutter_foreground_plugin;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.BinaryMessenger;
@@ -14,8 +16,6 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
-import io.flutter.embedding.engine.plugins.activity.ActivityAware;
-import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 
 /**
  * FlutterForegroundPlugin
@@ -28,8 +28,7 @@ public class FlutterForegroundPlugin implements FlutterPlugin, MethodCallHandler
 
     private Context context;
     private MethodChannel callbackChannel;
-    private BinaryMessenger messenger;
-    private int methodInterval = -1;
+    private long methodInterval = -1;
     private long dartServiceMethodHandle = -1;
     private boolean serviceStarted = false;
     private Runnable runnable;
@@ -43,15 +42,14 @@ public class FlutterForegroundPlugin implements FlutterPlugin, MethodCallHandler
 
     public void onAttachedToEngine(Context applicationContext, BinaryMessenger messenger) {
         System.out.println("onAttachedToEngine called!!");
-        this.messenger = messenger;
         this.context = applicationContext;
-        final MethodChannel channel = new MethodChannel(this.messenger, "com.changjoopark.flutter_foreground_plugin/main");
+        final MethodChannel channel = new MethodChannel(messenger, "com.changjoopark.flutter_foreground_plugin/main");
         channel.setMethodCallHandler(this);
         callbackChannel = new MethodChannel(messenger, "com.changjoopark.flutter_foreground_plugin/callback");
     }
 
     @Override
-    public void onDetachedFromEngine(FlutterPluginBinding binding) {
+    public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
         System.out.println("onDetachedFromEngine called!!");
     }
 
@@ -66,17 +64,24 @@ public class FlutterForegroundPlugin implements FlutterPlugin, MethodCallHandler
     }
 
     @Override
-    public void onMethodCall(MethodCall call, Result result) {
+    public void onMethodCall(MethodCall call, @NonNull Result result) {
         switch (call.method) {
             case "startForegroundService":
-                final Boolean holdWakeLock = call.argument("holdWakeLock");
                 final String icon = call.argument("icon");
-                final long color = call.argument("color");
+
+                Number colorBox = call.argument("color");
+                final int color = colorBox == null ? NotificationCompat.COLOR_DEFAULT : ((Number) colorBox).intValue();
+
                 final String title = call.argument("title");
                 final String content = call.argument("content");
                 final String subtext = call.argument("subtext");
-                final Boolean chronometer = call.argument("chronometer");
-                final Boolean stopAction = call.argument("stop_action");
+
+                Boolean chronometerBox = call.argument("chronometer");
+                final boolean chronometer = chronometerBox != null && chronometerBox;
+
+                Boolean stopActionBox = call.argument("stop_action");
+                final boolean stopAction = stopActionBox != null && stopActionBox;
+
                 final String stopIcon = call.argument("stop_icon");
                 final String stopText = call.argument("stop_text");
 
@@ -88,23 +93,21 @@ public class FlutterForegroundPlugin implements FlutterPlugin, MethodCallHandler
                 result.success("stopForegroundService");
                 break;
             case "setServiceMethodInterval":
-                if (call.argument("seconds") == null) {
+                Number secondsBox = call.argument("seconds");
+                if (secondsBox == null) {
                     result.notImplemented();
                     break;
                 }
-
-                int seconds = call.argument("seconds");
-                methodInterval = seconds;
+                methodInterval = secondsBox.longValue();
                 result.success("setServiceMethodInterval");
                 break;
             case "setServiceMethodHandle":
-                if (call.argument("serviceMethodHandle") == null) {
+                Number methodHandleBox = call.argument("serviceMethodHandle");
+                if (methodHandleBox == null) {
                     result.notImplemented();
                     break;
                 }
-
-                long methodHandle = call.argument("serviceMethodHandle");
-                dartServiceMethodHandle = methodHandle;
+                dartServiceMethodHandle = methodHandleBox.longValue();
 
                 result.success("setServiceMethodHandle");
                 break;
@@ -114,8 +117,8 @@ public class FlutterForegroundPlugin implements FlutterPlugin, MethodCallHandler
         }
     }
 
-    private void launchForegroundService(String icon, long color, String title, String content, String subtext,
-                                         Boolean chronometer, Boolean stopAction, String stopIcon,
+    private void launchForegroundService(String icon, int color, String title, String content, String subtext,
+                                         boolean chronometer, boolean stopAction, String stopIcon,
                                          String stopText) {
         Intent intent = new Intent(context, FlutterForegroundService.class);
         intent.setAction(START_FOREGROUND_ACTION);
@@ -168,7 +171,7 @@ public class FlutterForegroundPlugin implements FlutterPlugin, MethodCallHandler
             return;
         }
 
-        final int interval = methodInterval * 1000;
+        final long interval = methodInterval * 1000;
 
         if (runnable == null) {
             runnable = new Runnable() {
@@ -179,7 +182,7 @@ public class FlutterForegroundPlugin implements FlutterPlugin, MethodCallHandler
                     try {
                         callbackChannel.invokeMethod("onServiceMethodCallback", dartServiceMethodHandle);
                     } catch (Error e) {
-                        System.out.println(e);
+                        e.printStackTrace();
                     }
                     handler.postDelayed(this, interval);
                 }

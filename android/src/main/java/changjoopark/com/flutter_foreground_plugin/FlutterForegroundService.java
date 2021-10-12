@@ -1,5 +1,6 @@
 package changjoopark.com.flutter_foreground_plugin;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -55,7 +56,7 @@ public class FlutterForegroundService extends Service {
                 }
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
                         .setSmallIcon(getNotificationIcon(bundle.getString("icon")))
-                        .setColor(((Number) bundle.getLong("color")).intValue())
+                        .setColor(bundle.getInt("color"))
                         .setContentTitle(bundle.getString("title"))
                         .setContentText(bundle.getString("content"))
                         .setCategory(NotificationCompat.CATEGORY_SERVICE)

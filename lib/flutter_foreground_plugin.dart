@@ -21,13 +21,13 @@ class FlutterForegroundPlugin {
     required String iconName,
     int color = 0,
     required String title,
-    String content = "",
-    String subtext = "",
+    String? content,
+    String? subtext,
     bool chronometer = false,
     bool stopAction = false,
     String? stopIcon,
-    String stopText = 'Close',
-    String channelName = 'Channel for flutter_foreground_plugin',
+    String? stopText,
+    required String channelName,
   }) async {
     if (onStarted != null) {
       onStartedMethod = onStarted;

@@ -64,7 +64,7 @@ void startForegroundService() async {
       print("Foreground on Stopped");
     },
     title: "Flutter Foreground Service",
-    content: "This is Content",
+    // content: "This is Content",
     iconName: "ic_stat_hot_tub",
     channelName: "This is channel name",
   );

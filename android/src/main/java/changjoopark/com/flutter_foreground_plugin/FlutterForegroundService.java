@@ -1,5 +1,6 @@
 package changjoopark.com.flutter_foreground_plugin;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -10,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.graphics.Color;
 
 import androidx.core.app.NotificationCompat;
 
@@ -46,7 +48,7 @@ public class FlutterForegroundService extends Service {
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
-                            "flutter_foreground_service_channel",
+                            bundle.getString("channel_name"),
                             NotificationManager.IMPORTANCE_DEFAULT);
 
                     ((NotificationManager) getSystemService(NOTIFICATION_SERVICE))

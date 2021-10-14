@@ -11,8 +11,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
-
   @override
   void initState() {
     startForegroundService();
@@ -59,7 +57,6 @@ void startForegroundService() async {
   await FlutterForegroundPlugin.setServiceMethodInterval(seconds: 5);
   await FlutterForegroundPlugin.setServiceMethod(globalForegroundService);
   await FlutterForegroundPlugin.startForegroundService(
-    holdWakeLock: false,
     onStarted: () {
       print("Foreground on Started");
     },
@@ -67,8 +64,9 @@ void startForegroundService() async {
       print("Foreground on Stopped");
     },
     title: "Flutter Foreground Service",
-    content: "This is Content",
+    // content: "This is Content",
     iconName: "ic_stat_hot_tub",
+    channelName: "This is channel name",
   );
 }
 
